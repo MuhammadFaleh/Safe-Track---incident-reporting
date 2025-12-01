@@ -24,6 +24,9 @@ public class IncidentReportService {
     public String createIncidentReport(IncidentReport incidentReport){
         Employee e = employeeService.getEmployeeById(incidentReport.getReportedBy());
         if(e != null && e.getFactoryId().equals(incidentReport.getFactoryId())){
+            if(incidentReport.getDateReported() == null){
+                incidentReport.setDateReported(LocalDateTime.now());
+            }
             incidentReport.setStatus("Open");
             incidentReportRepository.save(incidentReport);
             return "success";
