@@ -22,6 +22,14 @@ public class EquipmentService {
     public String createEquipment(Equipment equipment){
         Factory f = factoryService.getFactoryById(equipment.getFactoryId());
         if(f != null){
+            if(equipment.getPurchaseDate() == null ){
+                equipment.setPurchaseDate(LocalDateTime.now());
+
+            }
+
+            if(equipment.getLastMaintenance() == null ){
+                equipment.setLastMaintenance(LocalDateTime.now());
+            }
             equipment.setStatus("Working");
             equipmentRepository.save(equipment);
             return "success";
