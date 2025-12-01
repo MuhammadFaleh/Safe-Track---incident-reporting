@@ -30,7 +30,7 @@ public class FactoryRequest {
     @Size(message = "must be 10 characters long", min = 10, max = 10)
     @Pattern(regexp = "^([0-9])*$",
             message = "please enter only numbers")
-    @Column( columnDefinition = "varchar(10) not null unique")
+    @Column( columnDefinition = "varchar(10) not null")
     private String factoryRecordNumber;
     @NotBlank(message = "city must not be empty")
     @Column(columnDefinition = "varchar(200) not null")
