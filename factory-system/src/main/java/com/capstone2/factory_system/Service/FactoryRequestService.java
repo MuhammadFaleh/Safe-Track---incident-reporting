@@ -25,6 +25,7 @@ public class FactoryRequestService {
                 return "factory is already approved";
             }if(f.getStatus().equalsIgnoreCase("rejected")){
                 factoryRequest.setEndDate(null);
+                factoryRequest.setRequestDate(LocalDateTime.now());
                 factoryRequest.setCheckedBy(null);
                 factoryRequest.setStatus("pending");
                 factoryRequestRepository.save(factoryRequest);
@@ -32,6 +33,7 @@ public class FactoryRequestService {
             }
             return "request is still pending you can update you request";
         }
+        factoryRequest.setRequestDate(LocalDateTime.now());
         factoryRequest.setEndDate(null);
         factoryRequest.setCheckedBy(null);
         factoryRequest.setStatus("pending");
@@ -79,6 +81,7 @@ public class FactoryRequestService {
         if(f != null){
             if(f.getStatus().equalsIgnoreCase("pending")){
                 f.setStatus("approved");
+                f.setCheckedBy(adminId);
                 f.setEndDate(LocalDateTime.now());
                 deletePendingRequests(factoryRecord, f);
                 factoryRequestRepository.save(f);
@@ -98,6 +101,7 @@ public class FactoryRequestService {
             if(f.getStatus().equalsIgnoreCase("pending")){
                 f.setStatus("rejected");
                 f.setEndDate(LocalDateTime.now());
+                f.setCheckedBy(adminId);
                 deletePendingRequests(factoryRecord, f);
                 factoryRequestRepository.save(f);
                 return "success";
