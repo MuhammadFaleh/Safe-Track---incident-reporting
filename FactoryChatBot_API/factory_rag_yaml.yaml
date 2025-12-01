@@ -1,0 +1,629 @@
+database_name: factory_system
+
+schema:
+  admin:
+    description: "Stores administrator accounts who can approve/reject factory requests"
+    columns:
+      - name: admin_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: email
+        type: varchar(200)
+        unique: true
+        not_null: true
+      - name: password
+        type: varchar(255)
+        not_null: true
+        constraint: "length > 4"
+      - name: username
+        type: varchar(40)
+        unique: true
+        not_null: true
+        constraint: "length > 3"
+
+  factory_request:
+    description: "Factory registration requests that need admin approval"
+    columns:
+      - name: factory_request_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: full_name
+        type: varchar(200)
+        not_null: true
+      - name: factory_name
+        type: varchar(255)
+        not_null: true
+      - name: factory_record_number
+        type: varchar(10)
+        unique: true
+        not_null: true
+      - name: city
+        type: varchar(200)
+        not_null: true
+      - name: status
+        type: varchar(10)
+        not_null: true
+        allowed_values: ['pending', 'approved', 'rejected']
+      - name: request_date
+        type: timestamp
+        default: current_timestamp
+      - name: end_date
+        type: timestamp
+        nullable: true
+      - name: checked_by
+        type: int
+        nullable: true
+        foreign_key: admin.admin_id
+
+  factory:
+    description: "Approved factories with login credentials"
+    columns:
+      - name: factory_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: factory_request_id
+        type: int
+        not_null: true
+        foreign_key: factory_request.factory_request_id
+      - name: username
+        type: varchar(40)
+        unique: true
+        not_null: true
+        constraint: "length > 3"
+      - name: email
+        type: varchar(200)
+        unique: true
+        not_null: true
+      - name: password
+        type: varchar(255)
+        not_null: true
+        constraint: "length > 4"
+      - name: full_name
+        type: varchar(200)
+        not_null: true
+      - name: factory_name
+        type: varchar(255)
+        not_null: true
+      - name: factory_record_number
+        type: varchar(10)
+        unique: true
+        not_null: true
+      - name: city
+        type: varchar(200)
+        not_null: true
+      - name: created_at
+        type: date
+        not_null: true
+
+  department:
+    description: "Factory departments (HR, R&D, Maintenance, Management)"
+    columns:
+      - name: department_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: factory_id
+        type: int
+        not_null: true
+        foreign_key: factory.factory_id
+      - name: name
+        type: varchar(200)
+        not_null: true
+        constraint: "length > 3"
+      - name: type
+        type: varchar(40)
+        not_null: true
+        allowed_values: ['HR', 'R&D', 'Maintenance', 'Management']
+
+  employee:
+    description: "Factory employees assigned to departments"
+    columns:
+      - name: employee_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: factory_id
+        type: int
+        not_null: true
+        foreign_key: factory.factory_id
+      - name: department_id
+        type: int
+        not_null: true
+        foreign_key: department.department_id
+      - name: manager_id
+        type: int
+        nullable: true
+        foreign_key: employee.employee_id
+      - name: full_name
+        type: varchar(200)
+        not_null: true
+      - name: email
+        type: varchar(200)
+        unique: true
+        not_null: true
+      - name: gender
+        type: varchar(1)
+        not_null: true
+        allowed_values: ['M', 'F']
+
+  equipment:
+    description: "Factory equipment and machinery tracking"
+    columns:
+      - name: equipment_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: factory_id
+        type: int
+        nullable: true
+        foreign_key: factory.factory_id
+      - name: serial_number
+        type: varchar(100)
+        not_null: true
+      - name: category
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Heavy Machinery', 'Light Machinery', 'Tools', 'Material Handling']
+      - name: status
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Working', 'Under Repair', 'Retired']
+      - name: purchase_date
+        type: timestamp
+        nullable: true
+      - name: last_maintenance
+        type: timestamp
+        nullable: true
+
+  incident_report:
+    description: "Safety incidents reported at the factory"
+    columns:
+      - name: incident_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: factory_id
+        type: int
+        not_null: true
+        foreign_key: factory.factory_id
+      - name: reported_by
+        type: int
+        not_null: true
+        foreign_key: employee.employee_id
+      - name: type
+        type: varchar(40)
+        not_null: true
+        allowed_values: ['Machinery Incident', 'Fire Incident', 'Chemical Incident', 'Electrical Incident', 'Gas Leak', 'Injury Incident']
+      - name: description
+        type: text
+        not_null: true
+        constraint: "length between 10 and 400"
+      - name: severity
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Low', 'Medium', 'High', 'Very High']
+      - name: status
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Open', 'Closed']
+      - name: date_reported
+        type: timestamp
+        default: current_timestamp
+
+  incident_affected_employee:
+    description: "Employees affected by incidents"
+    columns:
+      - name: id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: incident_id
+        type: int
+        not_null: true
+        foreign_key: incident_report.incident_id
+      - name: employee_id
+        type: int
+        not_null: true
+        foreign_key: employee.employee_id
+      - name: severity
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Low', 'Medium', 'High', 'Very High']
+      - name: notes
+        type: text
+        not_null: true
+        constraint: "length between 10 and 400"
+
+  incident_affected_equipment:
+    description: "Equipment damaged in incidents"
+    columns:
+      - name: id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: incident_id
+        type: int
+        not_null: true
+        foreign_key: incident_report.incident_id
+      - name: equipment_id
+        type: int
+        not_null: true
+        foreign_key: equipment.equipment_id
+      - name: severity
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Low', 'Medium', 'High', 'Very High']
+      - name: notes
+        type: text
+        not_null: true
+        constraint: "length between 10 and 400"
+
+  corrective_action:
+    description: "Actions taken to address incidents"
+    columns:
+      - name: action_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: incident_id
+        type: int
+        not_null: true
+        foreign_key: incident_report.incident_id
+      - name: description
+        type: text
+        not_null: true
+        constraint: "length between 10 and 400"
+      - name: status
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Open', 'Closed']
+      - name: start_date
+        type: timestamp
+        default: current_timestamp
+      - name: end_date
+        type: timestamp
+        nullable: true
+
+  repair:
+    description: "Equipment repair tracking"
+    columns:
+      - name: repair_id
+        type: int
+        primary_key: true
+        auto_increment: true
+      - name: factory_id
+        type: int
+        not_null: true
+        foreign_key: factory.factory_id
+      - name: equipment_id
+        type: int
+        not_null: true
+        foreign_key: equipment.equipment_id
+      - name: employee_id
+        type: int
+        not_null: true
+        foreign_key: employee.employee_id
+      - name: status
+        type: varchar(20)
+        not_null: true
+        allowed_values: ['Open', 'Closed']
+      - name: start_date
+        type: timestamp
+        default: current_timestamp
+      - name: end_date
+        type: timestamp
+        default: current_timestamp
+
+sample_data:
+  admin:
+    - admin_id: 1
+      username: "admin_sarah"
+      email: "sarah.admin@factorysystem.com"
+      password: "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eiE7L9kCQ.K2"
+      description: "System administrator who approves factory requests"
+
+  factory_request:
+    - factory_request_id: 1
+      full_name: "Michael Roberts"
+      factory_name: "TechManu Industries"
+      factory_record_number: "FM2024001"
+      city: "Detroit"
+      status: "approved"
+      request_date: "2024-11-15 09:30:00"
+      end_date: "2024-11-15 14:20:00"
+      checked_by: 1
+      description: "Approved manufacturing facility request"
+
+  factory:
+    - factory_id: 1
+      factory_request_id: 1
+      username: "techmanu_admin"
+      email: "admin@techmanu.com"
+      password: "$2b$12$8K7Y2jNqR5vWxLdPHAkCOYz6TtxMQJqhN8/LewY5eiE7L9kXZ.H3"
+      full_name: "Michael Roberts"
+      factory_name: "TechManu Industries"
+      factory_record_number: "FM2024001"
+      city: "Detroit"
+      created_at: "2024-11-15"
+      description: "Advanced manufacturing facility specializing in automotive parts"
+
+  department:
+    - department_id: 1
+      factory_id: 1
+      name: "Human Resources Department"
+      type: "HR"
+    - department_id: 2
+      factory_id: 1
+      name: "Research and Development"
+      type: "R&D"
+    - department_id: 3
+      factory_id: 1
+      name: "Maintenance and Repair"
+      type: "Maintenance"
+    - department_id: 4
+      factory_id: 1
+      name: "Operations Management"
+      type: "Management"
+
+  employee:
+    - employee_id: 1
+      factory_id: 1
+      department_id: 4
+      manager_id: null
+      full_name: "Jennifer Thompson"
+      email: "j.thompson@techmanu.com"
+      gender: "F"
+      role: "General Manager"
+    - employee_id: 2
+      factory_id: 1
+      department_id: 1
+      manager_id: 1
+      full_name: "David Chen"
+      email: "d.chen@techmanu.com"
+      gender: "M"
+      role: "HR Manager"
+    - employee_id: 3
+      factory_id: 1
+      department_id: 2
+      manager_id: 1
+      full_name: "Dr. Emily Watson"
+      email: "e.watson@techmanu.com"
+      gender: "F"
+      role: "R&D Director"
+    - employee_id: 4
+      factory_id: 1
+      department_id: 3
+      manager_id: 1
+      full_name: "Robert Martinez"
+      email: "r.martinez@techmanu.com"
+      gender: "M"
+      role: "Maintenance Supervisor"
+    - employee_id: 5
+      factory_id: 1
+      department_id: 3
+      manager_id: 4
+      full_name: "James Wilson"
+      email: "j.wilson@techmanu.com"
+      gender: "M"
+      role: "Maintenance Technician"
+    - employee_id: 6
+      factory_id: 1
+      department_id: 2
+      manager_id: 3
+      full_name: "Maria Garcia"
+      email: "m.garcia@techmanu.com"
+      gender: "F"
+      role: "Senior Engineer"
+    - employee_id: 7
+      factory_id: 1
+      department_id: 1
+      manager_id: 2
+      full_name: "Sarah Johnson"
+      email: "s.johnson@techmanu.com"
+      gender: "F"
+      role: "HR Specialist"
+
+  equipment:
+    - equipment_id: 1
+      factory_id: 1
+      serial_number: "CNC-2023-4501"
+      category: "Heavy Machinery"
+      status: "Working"
+      purchase_date: "2023-03-15 00:00:00"
+      last_maintenance: "2024-10-20 08:00:00"
+      description: "CNC Milling Machine - Primary production unit"
+    - equipment_id: 2
+      factory_id: 1
+      serial_number: "PRESS-2022-8847"
+      category: "Heavy Machinery"
+      status: "Working"
+      purchase_date: "2022-08-10 00:00:00"
+      last_maintenance: "2024-11-05 10:30:00"
+      description: "Hydraulic Press - 500 ton capacity"
+    - equipment_id: 3
+      factory_id: 1
+      serial_number: "WELD-2024-1123"
+      category: "Light Machinery"
+      status: "Under Repair"
+      purchase_date: "2024-01-22 00:00:00"
+      last_maintenance: "2024-09-12 14:00:00"
+      description: "Robotic Welding Station"
+    - equipment_id: 4
+      factory_id: 1
+      serial_number: "FORK-2021-6634"
+      category: "Material Handling"
+      status: "Working"
+      purchase_date: "2021-05-18 00:00:00"
+      last_maintenance: "2024-11-10 09:15:00"
+      description: "Electric Forklift - 3 ton capacity"
+    - equipment_id: 5
+      factory_id: 1
+      serial_number: "DRILL-2023-9921"
+      category: "Tools"
+      status: "Working"
+      purchase_date: "2023-07-05 00:00:00"
+      last_maintenance: "2024-08-25 11:00:00"
+      description: "Industrial Drill Press"
+
+  incident_report:
+    - incident_id: 1
+      factory_id: 1
+      reported_by: 5
+      type: "Machinery Incident"
+      description: "Welding robot malfunction caused sparks to fly beyond safety zone. Emergency stop activated. Minor equipment damage but no injuries reported. Area was evacuated immediately."
+      severity: "Medium"
+      status: "Closed"
+      date_reported: "2024-11-18 13:45:00"
+    - incident_id: 2
+      factory_id: 1
+      reported_by: 6
+      type: "Injury Incident"
+      description: "Employee slipped on wet floor near the hydraulic press area. Suffered minor ankle sprain. First aid administered on site. Floor was not properly marked after cleaning."
+      severity: "Low"
+      status: "Open"
+      date_reported: "2024-11-25 10:20:00"
+
+  incident_affected_employee:
+    - id: 1
+      incident_id: 2
+      employee_id: 6
+      severity: "Low"
+      notes: "Minor ankle sprain from slip and fall incident. Received first aid treatment. Recommended rest for 2 days before returning to normal duties."
+
+  incident_affected_equipment:
+    - id: 1
+      incident_id: 1
+      equipment_id: 3
+      severity: "Medium"
+      notes: "Robotic welding station control panel damaged during malfunction. Replacement parts ordered. Estimated repair time 5-7 business days."
+
+  corrective_action:
+    - action_id: 1
+      incident_id: 1
+      description: "Immediate shutdown and inspection of welding robot. Control software updated and safety sensors recalibrated. Additional safety barriers installed around work zone."
+      status: "Closed"
+      start_date: "2024-11-18 14:00:00"
+      end_date: "2024-11-22 16:30:00"
+    - action_id: 2
+      incident_id: 2
+      description: "Install additional wet floor warning signs. Implement mandatory floor inspection checklist after cleaning. Schedule safety training for all maintenance staff on proper signage."
+      status: "Open"
+      start_date: "2024-11-25 15:00:00"
+      end_date: null
+
+  repair:
+    - repair_id: 1
+      factory_id: 1
+      equipment_id: 3
+      employee_id: 5
+      status: "Open"
+      start_date: "2024-11-19 08:00:00"
+      end_date: "2024-11-19 08:00:00"
+      description: "Repairing control panel damage from welding robot malfunction"
+    - repair_id: 2
+      factory_id: 1
+      equipment_id: 2
+      employee_id: 4
+      status: "Closed"
+      start_date: "2024-11-05 09:00:00"
+      end_date: "2024-11-05 15:30:00"
+      description: "Routine maintenance and hydraulic fluid replacement for press"
+
+relationships:
+  - from: factory_request
+    to: admin
+    type: "checked_by relationship"
+    description: "Admin approves/rejects factory requests"
+  - from: factory
+    to: factory_request
+    type: "one-to-one"
+    description: "Approved factory request creates factory record"
+  - from: department
+    to: factory
+    type: "many-to-one"
+    description: "Multiple departments belong to one factory"
+  - from: employee
+    to: factory
+    type: "many-to-one"
+    description: "Employees work at one factory"
+  - from: employee
+    to: department
+    type: "many-to-one"
+    description: "Employees assigned to departments"
+  - from: employee
+    to: employee
+    type: "self-referencing (manager)"
+    description: "Employees can have manager relationships"
+  - from: equipment
+    to: factory
+    type: "many-to-one"
+    description: "Equipment belongs to factory"
+  - from: incident_report
+    to: factory
+    type: "many-to-one"
+    description: "Incidents occur at factory"
+  - from: incident_report
+    to: employee
+    type: "many-to-one (reported_by)"
+    description: "Employee reports incident"
+  - from: incident_affected_employee
+    to: incident_report
+    type: "many-to-one"
+    description: "Links employees affected by incident"
+  - from: incident_affected_equipment
+    to: incident_report
+    type: "many-to-one"
+    description: "Links equipment damaged in incident"
+  - from: corrective_action
+    to: incident_report
+    type: "many-to-one"
+    description: "Actions taken for incident"
+  - from: repair
+    to: equipment
+    type: "many-to-one"
+    description: "Repairs performed on equipment"
+  - from: repair
+    to: employee
+    type: "many-to-one"
+    description: "Employee performs repair"
+
+query_examples:
+  - question: "Show me all open incidents"
+    sql: "SELECT * FROM incident_report WHERE status = 'Open'"
+  - question: "Which equipment needs repair?"
+    sql: "SELECT * FROM equipment WHERE status = 'Under Repair'"
+  - question: "List all employees in the Maintenance department"
+    sql: "SELECT e.* FROM employee e JOIN department d ON e.department_id = d.department_id WHERE d.type = 'Maintenance'"
+  - question: "Show incidents with high severity"
+    sql: "SELECT * FROM incident_report WHERE severity IN ('High', 'Very High')"
+  - question: "Get all corrective actions for a specific incident"
+    sql: "SELECT * FROM corrective_action WHERE incident_id = 1"
+  - question: "List all pending factory requests"
+    sql: "SELECT * FROM factory_request WHERE status = 'pending'"
+  - question: "Show all equipment purchased in 2024"
+    sql: "SELECT * FROM equipment WHERE YEAR(purchase_date) = 2024"
+  - question: "Find employees who reported incidents"
+    sql: "SELECT DISTINCT e.* FROM employee e JOIN incident_report i ON e.employee_id = i.reported_by"
+
+business_rules:
+  - rule: "Factory must have approved request before creation"
+    description: "factory.factory_request_id must reference an approved factory_request"
+  - rule: "Passwords must be hashed and > 4 characters"
+    applies_to: ["admin", "factory"]
+  - rule: "Usernames must be unique and > 3 characters"
+    applies_to: ["admin", "factory"]
+  - rule: "Incident descriptions must be 10-400 characters"
+    applies_to: ["incident_report", "corrective_action", "incident_affected_employee", "incident_affected_equipment"]
+  - rule: "Department types are restricted"
+    allowed_values: ["HR", "R&D", "Maintenance", "Management"]
+  - rule: "Equipment categories are restricted"
+    allowed_values: ["Heavy Machinery", "Light Machinery", "Tools", "Material Handling"]
+  - rule: "Incident types are predefined"
+    allowed_values: ["Machinery Incident", "Fire Incident", "Chemical Incident", "Electrical Incident", "Gas Leak", "Injury Incident"]
+  - rule: "Severity levels are standardized"
+    allowed_values: ["Low", "Medium", "High", "Very High"]
+  - rule: "Status values for incidents and actions"
+    allowed_values: ["Open", "Closed"]
