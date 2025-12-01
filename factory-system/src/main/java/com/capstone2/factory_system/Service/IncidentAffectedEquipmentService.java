@@ -24,7 +24,7 @@ public class IncidentAffectedEquipmentService{
         Equipment e = equipmentService.getEquipmentById(equ.getEquipmentId());
         IncidentReport ir = incidentReportService.getIncidentById(equ.getIncidentId());
 
-        if(ir == null){
+        if(ir == null || ir.getStatus().equalsIgnoreCase("Closed")){
             return "incident doesn't exist";
         }
         if(e == null){
@@ -48,7 +48,7 @@ public class IncidentAffectedEquipmentService{
         if(iae == null){
             return "no incident matches the id";
         }
-        if(ir == null){
+        if(ir == null || ir.getStatus().equalsIgnoreCase("Closed")){
             return "incident doesn't exist";
         }
         if(e == null){
