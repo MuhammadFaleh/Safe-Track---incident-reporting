@@ -45,7 +45,7 @@ public class IncidentReportService {
             ir.setFactoryId(incidentReport.getFactoryId());
             ir.setReportedBy(incidentReport.getReportedBy());
             ir.setSeverity(incidentReport.getSeverity());
-            ir.setStatus("Open");
+            ir.setStatus(incidentReport.getStatus());
             incidentReportRepository.save(ir);
             return "success";
         }
