@@ -38,7 +38,6 @@ public class IncidentReport {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(columnDefinition = "TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime dateReported;
-    @NotBlank(message = "severity can't be empty")
     @Pattern(regexp = "^(Open|Closed)$"
             , message = "must be 'Open','Closed'")
     @Column(columnDefinition = "varchar(20) not null check(status='Open' or status='Closed')")
