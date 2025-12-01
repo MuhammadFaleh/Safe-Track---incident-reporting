@@ -21,6 +21,7 @@ public class CorrectiveActionService {
     }
 
     public String createCorrectiveAction(CorrectiveAction correctiveAction){
+        IncidentReport ir = incidentReportService.getIncidentById(correctiveAction.getIncidentId());
         if(correctiveAction.getStartDate() == null){
             correctiveAction.setStartDate(LocalDateTime.now());
         }
@@ -28,8 +29,11 @@ public class CorrectiveActionService {
             return "failed to create the report end date is before the start date";
 
         }
-        if(incidentReportService.getIncidentById(correctiveAction.getIncidentId()) == null){
+        if( ir == null  || ir.getStatus().equalsIgnoreCase("Closed")){
             return "incident doesn't exist";
+        }
+        if(correctiveAction.getStartDate() == null){
+            correctiveAction.setStartDate(LocalDateTime.now());
         }
         correctiveAction.setStatus("Open");
         correctiveActionRepository.save(correctiveAction);
@@ -72,6 +76,7 @@ public class CorrectiveActionService {
             if(ca.getStatus().equalsIgnoreCase("Open")){
                 if(employeeService.checkIfSameFactory(empId, incidentReport.getFactoryId() )){
                     ca.setStatus("Closed");
+                    ca.setEndDate(LocalDateTime.now());
                     correctiveActionRepository.save(ca);
                     return "success";
                 }
