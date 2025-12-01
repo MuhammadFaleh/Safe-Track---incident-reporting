@@ -27,6 +27,9 @@ public class RepairService{
         Equipment e = equipmentService.getEquipmentById(repair.getEquipmentId());
         if(e != null && employeeService.checkIfSameFactory(repair.getEmployeeId(),e.getFactoryId())
                 && e.getFactoryId().equals(repair.getFactoryId())){
+            if(repair.getStartDate() == null){
+                repair.setStartDate(LocalDateTime.now());
+            }
             repair.setStatus("Open");
             e.setStatus("Under Repair");
             equipmentRepository.save(e);
@@ -67,6 +70,7 @@ public class RepairService{
             if(r.getStatus().equalsIgnoreCase("Open")){
                 Equipment e = equipmentService.getEquipmentById(r.getEquipmentId());
                 e.setStatus("Working");
+                e.setLastMaintenance(LocalDateTime.now());
                 equipmentRepository.save(e);
                 r.setStatus("Closed");
                 r.setEndDate(LocalDateTime.now());
