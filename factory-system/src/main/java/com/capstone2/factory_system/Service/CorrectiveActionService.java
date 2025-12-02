@@ -68,6 +68,7 @@ public class CorrectiveActionService {
         CorrectiveAction ca = getCorrectiveActionById(id);
         if(ca != null){
             correctiveActionRepository.delete(ca);
+            return;
         }
         throw new ApiException("corrective action doesn't exist");
     }
@@ -102,3 +103,4 @@ public class CorrectiveActionService {
         return correctiveActionRepository.findCorrectiveActionByIncidentId(id);
     }
 }
+
