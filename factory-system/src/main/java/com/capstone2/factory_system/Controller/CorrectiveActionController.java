@@ -21,36 +21,22 @@ public class CorrectiveActionController {
     }
 
     @PostMapping("/create-corrective-action")
-    public ResponseEntity<?> createCorrectiveAction(@RequestBody @Valid CorrectiveAction correctiveAction, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = correctiveActionService.createCorrectiveAction(correctiveAction);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("corrective action was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createCorrectiveAction(@RequestBody @Valid CorrectiveAction correctiveAction){
+        correctiveActionService.createCorrectiveAction(correctiveAction);
+        return ResponseEntity.status(200).body(new ApiResponse("corrective action was created successfully"));
     }
 
     @PutMapping("/update-corrective-action/{id}")
-    public ResponseEntity<?> updateCorrectiveAction(@PathVariable Integer id, @RequestBody @Valid CorrectiveAction correctiveAction, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = correctiveActionService.updateCorrectiveAction(id, correctiveAction);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("corrective action was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateCorrectiveAction(@PathVariable Integer id, @RequestBody @Valid CorrectiveAction correctiveAction){
+
+        correctiveActionService.updateCorrectiveAction(id, correctiveAction);
+        return ResponseEntity.status(200).body(new ApiResponse("corrective action was updated successfully"));
     }
 
     @DeleteMapping("/delete-corrective-action/{id}")
     public ResponseEntity<?> deleteCorrectiveAction(@PathVariable Integer id){
-        String status = correctiveActionService.deleteCorrectiveAction(id);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("corrective action was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        correctiveActionService.deleteCorrectiveAction(id);
+        return ResponseEntity.status(200).body(new ApiResponse("corrective action was deleted successfully"));
     }
 
     @GetMapping("/get-corrective-action-id/{id}")
@@ -68,11 +54,8 @@ public class CorrectiveActionController {
     }
     @PutMapping("/change-status/{id}/{empId}")
     public ResponseEntity<?> changeStatus(@PathVariable Integer id, @PathVariable Integer empId){
-        String status = correctiveActionService.changeStatus(id, empId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("corrective action status was changed successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        correctiveActionService.changeStatus(id, empId);
+        return ResponseEntity.status(200).body(new ApiResponse("corrective action status was changed successfully"));
     }
 
 }

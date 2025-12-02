@@ -23,36 +23,23 @@ public class IncidentReportController {
     }
 
     @PostMapping("/create-incident-report")
-    public ResponseEntity<?> createIncidentReport(@RequestBody @Valid IncidentReport incidentReport, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = incidentReportService.createIncidentReport(incidentReport);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident report was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createIncidentReport(@RequestBody @Valid IncidentReport incidentReport){
+        incidentReportService.createIncidentReport(incidentReport);
+        return ResponseEntity.status(200).body(new ApiResponse("incident report was created successfully"));
+
     }
 
     @PutMapping("/update-incident-report/{id}")
-    public ResponseEntity<?> updateIncidentReport(@PathVariable Integer id, @RequestBody @Valid IncidentReport incidentReport, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = incidentReportService.updateIncidentReport(id, incidentReport);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident report was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateIncidentReport(@PathVariable Integer id, @RequestBody @Valid IncidentReport incidentReport){
+        incidentReportService.updateIncidentReport(id, incidentReport);
+        return ResponseEntity.status(200).body(new ApiResponse("incident report was updated successfully"));
+
     }
 
     @DeleteMapping("/delete-incident-report/{username}/{id}")
     public ResponseEntity<?> deleteIncident(@PathVariable String username, @PathVariable Integer id){
-        String status = incidentReportService.deleteIncident(username, id);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident report was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        return ResponseEntity.status(200).body(new ApiResponse("incident report was deleted successfully"));
+
     }
 
     @GetMapping("/get-incident-report-id/{id}")

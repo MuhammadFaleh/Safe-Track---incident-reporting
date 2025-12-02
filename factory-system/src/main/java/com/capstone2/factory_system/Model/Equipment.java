@@ -31,7 +31,6 @@ public class Equipment {
     @Column(columnDefinition = "varchar(20) not null check(category='Heavy Machinery' or category='Light Machinery' or category='Tools' " +
             "or category='Material Handling')")
     private String category;
-    @NotBlank(message = "status must not be empty")
     @Pattern(regexp = "^(Retired|Working|Under Repair)$", message = "must be " +
             "'Retired', 'Working','Under Repair'")
     @Column(columnDefinition = "varchar(20) not null check(status='Under Repair' or status='Working' or status='Retired')")

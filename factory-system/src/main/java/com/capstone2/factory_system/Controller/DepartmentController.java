@@ -21,36 +21,23 @@ public class DepartmentController {
     }
 
     @PostMapping("/create-department")
-    public ResponseEntity<?> createDepartment(@RequestBody @Valid Department department, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = departmentService.createDepartment(department);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("department was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createDepartment(@RequestBody @Valid Department department){
+        departmentService.createDepartment(department);
+        return ResponseEntity.status(200).body(new ApiResponse("department was created successfully"));
     }
 
     @PutMapping("/update-department/{id}/{username}")
-    public ResponseEntity<?> updateDepartment(@PathVariable Integer id, @PathVariable String username, @RequestBody @Valid Department department, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = departmentService.updateDepartment(id, department, username);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("department was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateDepartment(@PathVariable Integer id, @PathVariable String username, @RequestBody @Valid Department department){
+
+        departmentService.updateDepartment(id, department, username);
+        return ResponseEntity.status(200).body(new ApiResponse("department was updated successfully"));
     }
 
     @DeleteMapping("/delete-department/{id}/{username}")
     public ResponseEntity<?> deleteDepartment(@PathVariable Integer id, @PathVariable String username){
-        String status = departmentService.deleteDepartment(id, username);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("department was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        departmentService.deleteDepartment(id, username);
+        return ResponseEntity.status(200).body(new ApiResponse("department was deleted successfully"));
+
     }
 
     @GetMapping("/get-department-id/{id}")

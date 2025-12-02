@@ -21,34 +21,21 @@ public class AdminController {
     }
 
     @PostMapping("/create-admin")
-    public ResponseEntity<?> createAdmin(@RequestBody @Valid Admin admin, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = adminService.createAdmin(admin);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("admin was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createAdmin(@RequestBody @Valid Admin admin){
+        adminService.createAdmin(admin);
+        return ResponseEntity.status(200).body(new ApiResponse("admin was created successfully"));
+
     }
     @PutMapping("/update-admin/{id}")
     public ResponseEntity<?> updateAdmin(@PathVariable Integer id, @RequestBody @Valid Admin admin, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = adminService.updateAdmin(id,admin);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("admin was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+
+        adminService.updateAdmin(id,admin);
+        return ResponseEntity.status(200).body(new ApiResponse("admin was updated successfully"));
     }
     @DeleteMapping("/delete-admin/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable Integer id){
-        String status = adminService.deleteAdmin(id);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("admin was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        adminService.deleteAdmin(id);
+        return ResponseEntity.status(200).body(new ApiResponse("admin was deleted successfully"));
     }
 
     @GetMapping("/get-admin-id/{id}")

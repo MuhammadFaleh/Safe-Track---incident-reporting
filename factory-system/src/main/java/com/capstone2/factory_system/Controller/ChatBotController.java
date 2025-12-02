@@ -21,19 +21,13 @@ public class ChatBotController {
 
 
     @PostMapping("/ask-rag")
-    public ResponseEntity<?> askRAG(@RequestBody @Valid String question, Errors errors) {
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
+    public ResponseEntity<?> askRAG(@RequestBody String question) {
         RAGResponse response = chatBotService.askRAG(question);
         return ResponseEntity.status(200).body(response);
     }
 
     @PostMapping("/ask-sql")
-    public ResponseEntity<?> askSQL(@RequestBody @Valid String question, Errors errors) {
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
+    public ResponseEntity<?> askSQL(@RequestBody String question) {
         SQLResponse response = chatBotService.askSQL(question);
         return ResponseEntity.status(200).body(response);
     }

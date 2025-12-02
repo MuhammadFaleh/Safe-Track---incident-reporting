@@ -23,27 +23,22 @@ public class FactoryController {
     }
 
     @PostMapping("/create-factory")
-    public ResponseEntity<?> createFactory(@RequestBody @Valid Factory factory, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = factoryService.createFactory(factory);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createFactory(@RequestBody @Valid Factory factory){
+        factoryService.createFactory(factory);
+        return ResponseEntity.status(200).body(new ApiResponse("factory was created successfully"));
     }
 
     @PutMapping("/update-factory/{id}")
-    public ResponseEntity<?> updateFactory(@PathVariable Integer id, @RequestBody @Valid Factory factory, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = factoryService.updateFactory(id, factory);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateFactory(@PathVariable Integer id, @RequestBody @Valid Factory factory){
+        factoryService.updateFactory(id, factory);
+        return ResponseEntity.status(200).body(new ApiResponse("factory was updated successfully"));
+    }
+
+
+    @DeleteMapping("/delete-factory/{id}/{username}")
+    public ResponseEntity<?> deleteFactory(@PathVariable Integer id, @PathVariable String username){
+        factoryService.deleteFactory(id, username);
+        return ResponseEntity.status(200).body(new ApiResponse("factory was deleted successfully"));
     }
 
     @GetMapping("/get-factory-id/{id}")

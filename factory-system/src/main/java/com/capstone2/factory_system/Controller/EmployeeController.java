@@ -22,35 +22,20 @@ public class EmployeeController {
 
     @PostMapping("/create-employee")
     public ResponseEntity<?> createEmployee(@RequestBody @Valid Employee employee, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = employeeService.createEmployee(employee);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("employee was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        employeeService.createEmployee(employee);
+        return ResponseEntity.status(200).body(new ApiResponse("employee was created successfully"));
     }
 
     @PutMapping("/update-employee/{id}")
-    public ResponseEntity<?> updateEmployee(@PathVariable Integer id, @RequestBody @Valid Employee employee, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = employeeService.updateEmployee(id, employee);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("employee was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateEmployee(@PathVariable Integer id, @RequestBody @Valid Employee employee){
+        employeeService.updateEmployee(id, employee);
+        return ResponseEntity.status(200).body(new ApiResponse("employee was updated successfully"));
     }
 
     @DeleteMapping("/delete-employee/{id}/{username}")
     public ResponseEntity<?> deleteEmployee( @PathVariable Integer id, @PathVariable String username){
-        String status = employeeService.deleteEmployee(username, id);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("employee was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        employeeService.deleteEmployee(username, id);
+        return ResponseEntity.status(200).body(new ApiResponse("employee was deleted successfully"));
     }
 
     @GetMapping("/get-employee-id/{id}")

@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Department;
 import com.capstone2.factory_system.Model.Factory;
 import com.capstone2.factory_system.Repository.DepartmentRepository;
@@ -18,22 +19,22 @@ public class DepartmentService {
         return departmentRepository.findAll();
     }
 
-    public String createDepartment(Department department){
+    public void createDepartment(Department department){
         if(factoryService.getFactoryById(department.getFactoryId()) != null){
             if(!checkDepartmentNameExist(department.getFactoryId(), department.getName())){
                 departmentRepository.save(department);
-                return "success";
+                return;
             }
-            return "department name already exist";
+            throw new ApiException("department name already exist");
         }
-        return "factory doesn't exist";
+        throw new ApiException("factory doesn't exist");
 
     }
 
-    public String updateDepartment(Integer id, Department department, String username){
+    public void updateDepartment(Integer id, Department department, String username){
         Factory f = factoryService.getFactoryByUsername(username);
         if( f == null || !f.getFactoryId().equals(department.getFactoryId())){
-            return "factory doesn't exist or you don't have authorization";
+            throw new ApiException("factory doesn't exist or you don't have authorization");
         }
         Department d = getDepartmentById(id);
         if(d != null){
@@ -41,26 +42,24 @@ public class DepartmentService {
                     d.setName(department.getName());
                     d.setType(department.getType());
                     departmentRepository.save(d);
-                    return "success";
+                    return;
                 }
-                return "department name already exist";
+            throw new ApiException("department name already exist");
 
         }
-        return "department doesn't exist";
+        throw new ApiException("department doesn't exist");
     }
 
-    public String deleteDepartment(Integer id, String username){
+    public void deleteDepartment(Integer id, String username){
         Factory f = factoryService.getFactoryByUsername(username);
         Department d = getDepartmentById(id);
         if(d == null){
-            return "department doesn't exist";
+            throw new ApiException("department doesn't exist");
         }
         if( f == null || !f.getFactoryId().equals(d.getFactoryId())){
-            return "factory doesn't exist or you don't have authorization";
+            throw new ApiException("factory doesn't exist or you don't have authorization");
         }
         departmentRepository.delete(d);
-        return "success";
-
     }
 
     public boolean checkDepartmentNameExist(Integer factoryId, String name){

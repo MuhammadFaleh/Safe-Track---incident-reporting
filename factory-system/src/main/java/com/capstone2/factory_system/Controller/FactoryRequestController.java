@@ -21,36 +21,23 @@ public class FactoryRequestController {
     }
 
     @PostMapping("/create-factory-request")
-    public ResponseEntity<?> createFactoryRequest(@RequestBody @Valid FactoryRequest factoryRequest, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = factoryRequestService.createFactoryRequest(factoryRequest);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory request was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createFactoryRequest(@RequestBody @Valid FactoryRequest factoryRequest){
+        factoryRequestService.createFactoryRequest(factoryRequest);
+        return ResponseEntity.status(200).body(new ApiResponse("factory request was created successfully"));
+
     }
 
     @PutMapping("/update-factory-request/{factoryRecord}")
     public ResponseEntity<?> updateFactoryRequest(@PathVariable String factoryRecord, @RequestBody @Valid FactoryRequest factoryRequest, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = factoryRequestService.updateFactoryRequest(factoryRecord, factoryRequest);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory request was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        factoryRequestService.updateFactoryRequest(factoryRecord, factoryRequest);
+        return ResponseEntity.status(200).body(new ApiResponse("factory request was updated successfully"));
     }
 
     @DeleteMapping("/delete-factory-request/{id}")
     public ResponseEntity<?> deleteFactoryRequest(@PathVariable Integer id){
-        String status = factoryRequestService.deleteFactoryRequest(id);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory request was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        factoryRequestService.deleteFactoryRequest(id);
+        return ResponseEntity.status(200).body(new ApiResponse("factory request was deleted successfully"));
+
     }
 
     @GetMapping("/get-factory-request-id/{id}")
@@ -75,19 +62,13 @@ public class FactoryRequestController {
 
     @PutMapping("/approve/{factoryRecord}/{adminId}")
     public ResponseEntity<?> approve(@PathVariable String factoryRecord, @PathVariable Integer adminId){
-        String status = factoryRequestService.approve(factoryRecord, adminId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory request was approved successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        factoryRequestService.approve(factoryRecord, adminId);
+        return ResponseEntity.status(200).body(new ApiResponse("factory request was approved successfully"));
     }
 
     @PutMapping("/reject/{factoryRecord}/{adminId}")
     public ResponseEntity<?> reject(@PathVariable String factoryRecord, @PathVariable Integer adminId){
-        String status = factoryRequestService.reject(factoryRecord, adminId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("factory request was rejected successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        factoryRequestService.reject(factoryRecord, adminId);
+        return ResponseEntity.status(200).body(new ApiResponse("factory request was rejected successfully"));
     }
 }

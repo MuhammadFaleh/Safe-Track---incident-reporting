@@ -23,36 +23,24 @@ public class EquipmentController {
     }
 
     @PostMapping("/create-equipment")
-    public ResponseEntity<?> createEquipment(@RequestBody @Valid Equipment equipment, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = equipmentService.createEquipment(equipment);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("equipment was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createEquipment(@RequestBody @Valid Equipment equipment){
+        equipmentService.createEquipment(equipment);
+        return ResponseEntity.status(200).body(new ApiResponse("equipment was created successfully"));
+
     }
 
     @PutMapping("/update-equipment/{id}")
-    public ResponseEntity<?> updateEquipment(@PathVariable Integer id, @RequestBody @Valid Equipment equipment, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = equipmentService.updateEquipment(id, equipment);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("equipment was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateEquipment(@PathVariable Integer id, @RequestBody @Valid Equipment equipment){
+        equipmentService.updateEquipment(id, equipment);
+        return ResponseEntity.status(200).body(new ApiResponse("equipment was updated successfully"));
+
     }
 
     @DeleteMapping("/delete-equipment/{id}/{username}")
     public ResponseEntity<?> deleteEquipment( @PathVariable Integer id, @PathVariable String username){
-        String status = equipmentService.deleteEquipment(username, id);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("equipment was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        equipmentService.deleteEquipment(username, id);
+        return ResponseEntity.status(200).body(new ApiResponse("equipment was deleted successfully"));
+
     }
 
     @GetMapping("/get-equipment-id/{id}")
@@ -65,22 +53,16 @@ public class EquipmentController {
         return ResponseEntity.status(200).body(equipmentService.getByFactoryId(id));
     }
 
-    @PutMapping("/set-retired/{id}/{employeeId}")
-    public ResponseEntity<?> setRetired(@PathVariable Integer id, @PathVariable Integer employeeId){
-        String status = equipmentService.setRetired(id, employeeId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("equipment status was set to retired successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    @PutMapping("/set-retired/{id}/{username}")
+    public ResponseEntity<?> setRetired(@PathVariable Integer id, @PathVariable String username){
+        equipmentService.setRetired(id, username);
+        return ResponseEntity.status(200).body(new ApiResponse("equipment status was set to retired successfully"));
     }
 
     @PutMapping("/set-under-repair/{id}/{employeeId}")
     public ResponseEntity<?> setUnderRepair(@PathVariable Integer id, @PathVariable Integer employeeId){
-        String status = equipmentService.setUnderRepair(id, employeeId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("equipment status was set to under repair successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        equipmentService.setUnderRepair(id, employeeId);
+        return ResponseEntity.status(200).body(new ApiResponse("equipment status was set to under repair successfully"));
     }
 
     @GetMapping("/get-last-maintenance-range/{id}/{dateTime1}/{dateTime2}")

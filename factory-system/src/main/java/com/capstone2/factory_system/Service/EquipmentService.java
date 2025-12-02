@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Equipment;
 import com.capstone2.factory_system.Model.Factory;
 import com.capstone2.factory_system.Repository.EquipmentRepository;
@@ -19,7 +20,7 @@ public class EquipmentService {
         return equipmentRepository.findAll();
     }
 
-    public String createEquipment(Equipment equipment){
+    public void createEquipment(Equipment equipment){
         Factory f = factoryService.getFactoryById(equipment.getFactoryId());
         if(f != null){
             if(equipment.getPurchaseDate() == null ){
@@ -32,12 +33,12 @@ public class EquipmentService {
             }
             equipment.setStatus("Working");
             equipmentRepository.save(equipment);
-            return "success";
+            return;
         }
-        return "factory doesn't exist";
+        throw new ApiException("factory doesn't exist");
     }
 
-    public String updateEquipment(Integer id, Equipment equipment){
+    public void updateEquipment(Integer id, Equipment equipment){
         Equipment e = getEquipmentById(id);
         if(e!=null){
             e.setCategory(equipment.getCategory());
@@ -45,52 +46,54 @@ public class EquipmentService {
             e.setStatus(equipment.getStatus());
             e.setSerialNumber(equipment.getSerialNumber());
             equipmentRepository.save(e);
-            return "success";
+            return;
         }
-        return "no equipment exist";
+        throw new ApiException("no equipment exist");
     }
 
-    public String deleteEquipment(String username, Integer id){
+    public void deleteEquipment(String username, Integer id){
         Equipment e = getEquipmentById(id);
         Factory f = factoryService.getFactoryByUsername(username);
         if(e == null){
-            return "no record found";
+            throw new ApiException("no record found");
         }
         if(f != null && f.getFactoryId().equals(e.getFactoryId())){
             equipmentRepository.delete(e);
-            return "success";
+            return;
         }
-        return "unauthorized";
+        throw new ApiException("unauthorized");
     }
 
-    public String setRetired(Integer id, Integer employeeId){
+    public void setRetired(Integer id, String username){
         Equipment e = getEquipmentById(id);
+
         if(e!=null){
-            if(employeeService.checkIfSameFactory(employeeId, e.getFactoryId())){
+            Factory f = factoryService.getFactoryById(e.getFactoryId());
+            if(f.getUsername().equalsIgnoreCase(username)){
                 e.setStatus("Retired");
                 equipmentRepository.save(e);
-                return "success";
+                return;
             }
-            return "unauthorized";
+            throw new ApiException("unauthorized");
 
         }
-        return "no equipment exist";
+        throw new ApiException("no equipment exist");
 
     }
 
 
-    public String setUnderRepair(Integer id, Integer employeeId){
+    public void setUnderRepair(Integer id, Integer employeeId){
         Equipment e = getEquipmentById(id);
         if(e!=null){
             if(employeeService.checkIfSameFactory(employeeId, e.getFactoryId())){
                 e.setStatus("Under Repair");
                 equipmentRepository.save(e);
-                return "success";
+                return;
             }
-            return "unauthorized";
+            throw new ApiException("unauthorized");
 
         }
-        return "no equipment exist";
+        throw new ApiException("no equipment exist");
 
     }
     public List<Equipment> getByFactoryId(Integer id){

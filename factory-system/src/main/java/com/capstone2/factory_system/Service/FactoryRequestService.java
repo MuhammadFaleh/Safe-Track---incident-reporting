@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.FactoryRequest;
 import com.capstone2.factory_system.Repository.FactoryRequestRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,30 +19,23 @@ public class FactoryRequestService {
         return factoryRequestRepository.findAll();
     }
 
-    public String createFactoryRequest(FactoryRequest factoryRequest){
+    public void createFactoryRequest(FactoryRequest factoryRequest){
         FactoryRequest f = getNewestRequest(factoryRequest.getFactoryRecordNumber());
         if(f != null){
             if(f.getStatus().equalsIgnoreCase("approved")){
-                return "factory is already approved";
-            }if(f.getStatus().equalsIgnoreCase("rejected")){
-                factoryRequest.setEndDate(null);
-                factoryRequest.setRequestDate(LocalDateTime.now());
-                factoryRequest.setCheckedBy(null);
-                factoryRequest.setStatus("pending");
-                factoryRequestRepository.save(factoryRequest);
-                return "success";
+                throw new ApiException("factory is already approved");
+            }if(f.getStatus().equalsIgnoreCase("pending")){
+                throw new ApiException("request is still pending you can update you request");
             }
-            return "request is still pending you can update you request";
         }
-        factoryRequest.setRequestDate(LocalDateTime.now());
-        factoryRequest.setEndDate(null);
-        factoryRequest.setCheckedBy(null);
-        factoryRequest.setStatus("pending");
-        factoryRequestRepository.save(factoryRequest);
-        return "success";
+            factoryRequest.setEndDate(null);
+            factoryRequest.setRequestDate(LocalDateTime.now());
+            factoryRequest.setCheckedBy(null);
+            factoryRequest.setStatus("pending");
+            factoryRequestRepository.save(factoryRequest);
     }
 
-    public String updateFactoryRequest(String factoryRecord, FactoryRequest factoryRequest){
+    public void updateFactoryRequest(String factoryRecord, FactoryRequest factoryRequest){
         FactoryRequest f = getNewestRequest(factoryRecord);
         if(f != null){
             if(f.getStatus().equalsIgnoreCase("pending")){
@@ -52,31 +46,31 @@ public class FactoryRequestService {
                         f.setFullName(factoryRequest.getFullName());
                         f.setFactoryRecordNumber(factoryRequest.getFactoryRecordNumber());
                         factoryRequestRepository.save(f);
-                        return "success";
+                        return;
                     }
-                    return "wrong factory record number";
+                throw new ApiException("wrong factory record number");
                 }
-            return "factory is checked by the admin make another if rejected";
+            throw new ApiException("factory is checked by the admin make another if rejected");
             }
-        return "factory record doesn't exist";
+        throw new ApiException("factory record doesn't exist");
     }
 
-    public String deleteFactoryRequest(Integer id){
+    public void deleteFactoryRequest(Integer id){
         FactoryRequest f = getFactoryRequestId(id);
         if(f != null){
             if(f.getStatus().equalsIgnoreCase("pending")){
                factoryRequestRepository.delete(f);
-               return "success";
+               return;
             }
-            return "factory is checked by the admin make another if rejected";
+            throw new ApiException("factory is checked by the admin make another if rejected");
         }
-        return "factory record doesn't exist";
+        throw new ApiException("factory record doesn't exist");
     }
     // extra
-    public String approve(String factoryRecord, Integer adminId){
+    public void approve(String factoryRecord, Integer adminId){
         FactoryRequest f = getNewestRequest(factoryRecord);
         if(adminService.getAdminById(adminId) == null){
-            return "unauthorized";
+            throw new ApiException("unauthorized");
         }
         if(f != null){
             if(f.getStatus().equalsIgnoreCase("pending")){
@@ -85,17 +79,17 @@ public class FactoryRequestService {
                 f.setEndDate(LocalDateTime.now());
                 deletePendingRequests(factoryRecord, f);
                 factoryRequestRepository.save(f);
-                return "success";
+                return;
             }
-            return "already checked";
+            throw new ApiException("already checked");
         }
-        return "no records found";
+        throw new ApiException("no records found");
     }
 
-    public String reject(String factoryRecord, Integer adminId){
+    public void reject(String factoryRecord, Integer adminId){
         FactoryRequest f = getNewestRequest(factoryRecord);
         if(adminService.getAdminById(adminId) == null){
-            return "unauthorized";
+            throw new ApiException("unauthorized");
         }
         if(f != null){
             if(f.getStatus().equalsIgnoreCase("pending")){
@@ -104,11 +98,11 @@ public class FactoryRequestService {
                 f.setCheckedBy(adminId);
                 deletePendingRequests(factoryRecord, f);
                 factoryRequestRepository.save(f);
-                return "success";
+                return;
             }
-            return "already checked";
+            throw new ApiException("already checked");
         }
-        return "no records found";
+        throw new ApiException("no records found");
     }
 
     public List<FactoryRequest> getFactoryByRecords(String factoryRecord){

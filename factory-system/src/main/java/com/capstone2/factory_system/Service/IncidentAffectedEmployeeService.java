@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Employee;
 import com.capstone2.factory_system.Model.Factory;
 import com.capstone2.factory_system.Model.IncidentAffectedEmployee;
@@ -23,68 +24,67 @@ public class IncidentAffectedEmployeeService {
         return incidentAffectedEmployeeRepository.findAll();
     }
 
-    public String createIncidentAffectedEmp(IncidentAffectedEmployee emp){
+    public void createIncidentAffectedEmp(IncidentAffectedEmployee emp){
         Employee e = employeeService.getEmployeeById(emp.getEmployeeId());
         IncidentReport ir = incidentReportService.getIncidentById(emp.getIncidentId());
 
         if(ir == null || ir.getStatus().equalsIgnoreCase("Closed")){
-            return "incident doesn't exist";
+            throw new ApiException("incident doesn't exist or is closed");
         }
+
         if(e == null){
-            return "employee doesn't exist";
+            throw new ApiException("employee doesn't exist");
         }
 
         if(!e.getFactoryId().equals(ir.getFactoryId())){
-            return "factory id doesn't match";
+            throw new ApiException("factory id doesn't match");
 
         }
 
         incidentAffectedEmployeeRepository.save(emp);
-        return "success";
     }
 
-    public String updateIncidentAffectedEmp(Integer id, IncidentAffectedEmployee emp){
+    public void updateIncidentAffectedEmp(Integer id, IncidentAffectedEmployee emp){
         IncidentAffectedEmployee iae = getIncidentById(id);
         Employee e = employeeService.getEmployeeById(emp.getEmployeeId());
         IncidentReport ir = incidentReportService.getIncidentById(emp.getIncidentId());
 
         if(iae == null){
-            return "no incident matches the id";
+            throw new ApiException("no incident matches the id");
         }
         if(ir == null || ir.getStatus().equalsIgnoreCase("Closed")){
-            return "incident doesn't exist";
+            throw new ApiException("incident doesn't exist or is closed");
         }
         if(e == null){
-            return "employee doesn't exist";
+            throw new ApiException("employee doesn't exist");
         }
 
         if(!e.getFactoryId().equals(ir.getFactoryId())){
-            return "factory id doesn't match";
+            throw new ApiException("factory id doesn't match");
         }
 
         iae.setNotes(emp.getNotes());
         iae.setSeverity(emp.getSeverity());
         incidentAffectedEmployeeRepository.save(iae);
-        return "success";
     }
 
-    public String deleteIncidentAffectedEmp(Integer id, String username) {
+    public void deleteIncidentAffectedEmp(Integer id, String username) {
         IncidentAffectedEmployee iae = getIncidentById(id);
 
         Factory f = factoryService.getFactoryByUsername(username);
 
         if (iae == null) {
-            return "no incident matches the id";
+            throw new ApiException("no incident matches the id");
         }
         IncidentReport ir = incidentReportService.getIncidentById(iae.getIncidentId());
         if (ir != null) {
             if (f != null && f.getFactoryId().equals(ir.getFactoryId())) {
                 incidentAffectedEmployeeRepository.delete(iae);
-                return "success";
+                return;
             }
-            return "unauthorized";
+            throw new ApiException("unauthorized");
         }
-        return "no incident report";
+        throw new ApiException("no incident report");
     }
 
     public IncidentAffectedEmployee getIncidentById(Integer id){

@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Factory;
 import com.capstone2.factory_system.Model.FactoryRequest;
 import com.capstone2.factory_system.Repository.FactoryRepository;
@@ -19,43 +20,53 @@ public class FactoryService {
         return factoryRepository.findAll();
     }
 
-    public String createFactory(Factory factory){
+    public void createFactory(Factory factory){
         if(getFactoryByFactoryRecordNumber(factory.getFactoryRecordNumber()) != null){
-            return "factory already exist";
+            throw new ApiException("factory already exist");
         }
         if(getFactoryByEmail(factory.getEmail()) != null || getFactoryByUsername(factory.getUsername()) != null){
-            return "username or email already exist";
+            throw new ApiException("username or email already exist");
         }
         FactoryRequest fr = factoryRequestService.getFactoryRequestId(factory.getFactoryRequestId());
-        if(fr != null && fr.getStatus().equalsIgnoreCase("approved")){
+        if(fr != null && fr.getStatus().equalsIgnoreCase("approved") && fr.getFactoryRecordNumber().equalsIgnoreCase(factory.getFactoryRecordNumber())){
             factory.setCreatedAt(LocalDate.now());
+            factory.setCity(fr.getCity());
             factoryRepository.save(factory);
-            return "success";
+            return;
         }
-        return "factory request not yet approved";
+        throw new ApiException("factory request not yet approved or information doesn't match");
     }
 
-    public String updateFactory(Integer id, Factory factory){
+    public void updateFactory(Integer id, Factory factory){
         Factory f = getFactoryById(id);
-        if(getFactoryByFactoryRecordNumber(factory.getFactoryRecordNumber()) != null && !factory.getFactoryRecordNumber().equalsIgnoreCase(f.getFactoryRecordNumber())){
-            return "factory record number is incorrect";
-        }
         if(getFactoryByEmail(factory.getEmail()) != null && !f.getEmail().equalsIgnoreCase(factory.getEmail())
                 || getFactoryByUsername(factory.getUsername()) != null && !f.getUsername().equalsIgnoreCase(factory.getUsername())){
-            return "username or email already exist";
+            throw new ApiException("username or email already exist");
         }
         FactoryRequest fr = factoryRequestService.getFactoryRequestId(factory.getFactoryRequestId());
         if(fr != null && fr.getStatus().equalsIgnoreCase("approved")){
             f.setEmail(factory.getEmail());
             f.setUsername(factory.getUsername());
-            f.setCity(factory.getCity());
             f.setPassword(factory.getPassword());
             f.setFullName(factory.getFullName());
             f.setFactoryName(factory.getFactoryName());
             factoryRepository.save(f);
-            return "success";
+            return;
         }
-        return "factory request not yet approved";
+        throw new ApiException("factory request not yet approved");
+    }
+
+
+    public void deleteFactory(Integer id, String username){
+        Factory f = getFactoryById(id);
+        if(f == null){
+            throw new ApiException("factory doesn't exist");
+        }
+        if(!f.getUsername().equalsIgnoreCase(username)){
+            throw new ApiException("not authorized to delete");
+        }
+        factoryRepository.delete(f);
+
     }
 
     public Factory getFactoryById(Integer id){

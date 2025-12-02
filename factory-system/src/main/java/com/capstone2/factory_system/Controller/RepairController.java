@@ -23,45 +23,28 @@ public class RepairController {
     }
 
     @PostMapping("/create-repair")
-    public ResponseEntity<?> createRepair(@RequestBody @Valid Repair repair, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = repairService.createRepair(repair);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("repair was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createRepair(@RequestBody @Valid Repair repair){
+        repairService.createRepair(repair);
+        return ResponseEntity.status(200).body(new ApiResponse("repair was created successfully"));
+
     }
 
     @PutMapping("/update-repair/{id}")
-    public ResponseEntity<?> updateRepair(@PathVariable Integer id, @RequestBody @Valid Repair repair, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = repairService.updateRepair(id, repair);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("repair was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateRepair(@PathVariable Integer id, @RequestBody @Valid Repair repair){
+        repairService.updateRepair(id, repair);
+        return ResponseEntity.status(200).body(new ApiResponse("repair was updated successfully"));
+
     }
 
     @DeleteMapping("/delete-repair/{id}/{employeeId}")
     public ResponseEntity<?> deleteRepair(@PathVariable Integer id, @PathVariable Integer employeeId){
-        String status = repairService.deleteRepair(id, employeeId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("repair was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        repairService.deleteRepair(id, employeeId);
+        return ResponseEntity.status(200).body(new ApiResponse("repair was deleted successfully"));
     }
 
     @PutMapping("/set-status-close/{id}/{employeeId}")
     public ResponseEntity<?> setStatusClose(@PathVariable Integer id, @PathVariable Integer employeeId){
-        String status = repairService.setStatusClose(id, employeeId);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("repair status was set to closed successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        return ResponseEntity.status(200).body(new ApiResponse("repair status was set to closed successfully"));
     }
 
     @GetMapping("/get-repair-id/{id}")

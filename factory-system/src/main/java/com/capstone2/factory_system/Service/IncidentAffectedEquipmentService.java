@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.*;
 import com.capstone2.factory_system.Repository.IncidentAffectedEquipmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,68 +21,67 @@ public class IncidentAffectedEquipmentService{
         return incidentAffectedEquipmentRepository.findAll();
     }
 
-    public String createIncidentAffectedEqu(IncidentAffectedEquipment equ){
+    public void createIncidentAffectedEqu(IncidentAffectedEquipment equ){
         Equipment e = equipmentService.getEquipmentById(equ.getEquipmentId());
         IncidentReport ir = incidentReportService.getIncidentById(equ.getIncidentId());
 
         if(ir == null || ir.getStatus().equalsIgnoreCase("Closed")){
-            return "incident doesn't exist";
+            throw new ApiException("incident doesn't exist");
         }
         if(e == null){
-            return "equipment doesn't exist";
+            throw new ApiException("equipment doesn't exist");
         }
 
         if(!e.getFactoryId().equals(ir.getFactoryId())){
-            return "factory id doesn't match";
+            throw new ApiException("factory id doesn't match");
 
         }
 
         incidentAffectedEquipmentRepository.save(equ);
-        return "success";
+        throw new ApiException("success");
     }
 
-    public String updateIncidentAffectedEqu(Integer id, IncidentAffectedEquipment equ){
+    public void updateIncidentAffectedEqu(Integer id, IncidentAffectedEquipment equ){
         IncidentAffectedEquipment iae = getIncidentById(id);
         Equipment e = equipmentService.getEquipmentById(equ.getEquipmentId());
         IncidentReport ir = incidentReportService.getIncidentById(equ.getIncidentId());
 
         if(iae == null){
-            return "no incident matches the id";
+            throw new ApiException("no incident matches the id");
         }
         if(ir == null || ir.getStatus().equalsIgnoreCase("Closed")){
-            return "incident doesn't exist";
+            throw new ApiException("incident doesn't exist");
         }
         if(e == null){
-            return "equipment doesn't exist";
+            throw new ApiException("equipment doesn't exist");
         }
 
         if(!e.getFactoryId().equals(ir.getFactoryId())){
-            return "factory id doesn't match";
+            throw new ApiException("factory id doesn't match");
         }
 
         iae.setNotes(equ.getNotes());
         iae.setSeverity(equ.getSeverity());
         incidentAffectedEquipmentRepository.save(iae);
-        return "success";
     }
 
-    public String deleteIncidentAffectedEqu(Integer id, String username) {
+    public void deleteIncidentAffectedEqu(Integer id, String username) {
         IncidentAffectedEquipment iae = getIncidentById(id);
 
         Factory f = factoryService.getFactoryByUsername(username);
 
         if (iae == null) {
-            return "no incident matches the id";
+            throw new ApiException("no incident matches the id");
         }
         IncidentReport ir = incidentReportService.getIncidentById(iae.getIncidentId());
         if (ir != null) {
             if (f != null && f.getFactoryId().equals(ir.getFactoryId())) {
                 incidentAffectedEquipmentRepository.delete(iae);
-                return "success";
+                throw new ApiException("success");
             }
-            return "unauthorized";
+            throw new ApiException("unauthorized");
         }
-        return "no incident report";
+        throw new ApiException("no incident report");
     }
 
     public IncidentAffectedEquipment getIncidentById(Integer id){

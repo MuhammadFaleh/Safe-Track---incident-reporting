@@ -21,36 +21,22 @@ public class IncidentAffectedEquipmentController {
     }
 
     @PostMapping("/create-incident-affected-equipment")
-    public ResponseEntity<?> createIncidentAffectedEqu(@RequestBody @Valid IncidentAffectedEquipment incidentAffectedEquipment, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = incidentAffectedEquipmentService.createIncidentAffectedEqu(incidentAffectedEquipment);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident affected equipment was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createIncidentAffectedEqu(@RequestBody @Valid IncidentAffectedEquipment incidentAffectedEquipment){
+        incidentAffectedEquipmentService.createIncidentAffectedEqu(incidentAffectedEquipment);
+        return ResponseEntity.status(200).body(new ApiResponse("incident affected equipment was created successfully"));
     }
 
     @PutMapping("/update-incident-affected-equipment/{id}")
-    public ResponseEntity<?> updateIncidentAffectedEqu(@PathVariable Integer id, @RequestBody @Valid IncidentAffectedEquipment incidentAffectedEquipment, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = incidentAffectedEquipmentService.updateIncidentAffectedEqu(id, incidentAffectedEquipment);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident affected equipment was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateIncidentAffectedEqu(@PathVariable Integer id, @RequestBody @Valid IncidentAffectedEquipment incidentAffectedEquipment){
+        incidentAffectedEquipmentService.updateIncidentAffectedEqu(id, incidentAffectedEquipment);
+        return ResponseEntity.status(200).body(new ApiResponse("incident affected equipment was updated successfully"));
+
     }
 
     @DeleteMapping("/delete-incident-affected-equipment/{id}/{username}")
     public ResponseEntity<?> deleteIncidentAffectedEqu(@PathVariable Integer id, @PathVariable String username){
-        String status = incidentAffectedEquipmentService.deleteIncidentAffectedEqu(id, username);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident affected equipment was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        incidentAffectedEquipmentService.deleteIncidentAffectedEqu(id, username);
+        return ResponseEntity.status(200).body(new ApiResponse("incident affected equipment was deleted successfully"));
     }
 
     @GetMapping("/get-incident-affected-equipment-id/{id}")

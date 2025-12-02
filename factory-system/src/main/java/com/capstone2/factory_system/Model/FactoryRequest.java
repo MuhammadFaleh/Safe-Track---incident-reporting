@@ -36,7 +36,7 @@ public class FactoryRequest {
     @Column(columnDefinition = "varchar(200) not null")
     private String city;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(columnDefinition = "TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP")
+    @Column(columnDefinition = "TIMESTAMP not null")
     private LocalDateTime requestDate;
     @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime endDate;

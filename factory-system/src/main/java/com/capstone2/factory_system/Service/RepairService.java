@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Equipment;
 import com.capstone2.factory_system.Model.Repair;
 import com.capstone2.factory_system.Repository.EquipmentRepository;
@@ -23,7 +24,7 @@ public class RepairService{
         return repairRepository.findAll();
     }
 
-    public String createRepair(Repair repair){
+    public void createRepair(Repair repair){
         Equipment e = equipmentService.getEquipmentById(repair.getEquipmentId());
         if(e != null && employeeService.checkIfSameFactory(repair.getEmployeeId(),e.getFactoryId())
                 && e.getFactoryId().equals(repair.getFactoryId())){
@@ -34,15 +35,15 @@ public class RepairService{
             e.setStatus("Under Repair");
             equipmentRepository.save(e);
             repairRepository.save(repair);
-            return "success";
+            return;
         }
-        return "equipment doesn't exist or unauthorized";
+        throw new ApiException("equipment doesn't exist or unauthorized");
     }
 
-    public String updateRepair(Integer id, Repair repair){
+    public void updateRepair(Integer id, Repair repair){
         Repair r = getRepairById(id);
         if(r == null){
-            return "repair request doesn't exist";
+            throw new ApiException("repair request doesn't exist");
         }
         Equipment e = equipmentService.getEquipmentById(repair.getEquipmentId());
         if(e != null && employeeService.checkIfSameFactory(repair.getEmployeeId(),e.getFactoryId())
@@ -50,21 +51,21 @@ public class RepairService{
             r.setStatus(repair.getStatus());
             r.setEndDate(repair.getEndDate());
             repairRepository.save(r);
-            return "success";
+            return;
         }
-        return "equipment doesn't exist or unauthorized";
+        throw new ApiException("equipment doesn't exist or unauthorized");
     }
 
-    public String deleteRepair(Integer id, Integer employeeId){
+    public void deleteRepair(Integer id, Integer employeeId){
         Repair r = getRepairById(id);
-        if(r != null && employeeService.checkIfSameFactory(employeeId, r.getFactoryId())){
-            repairRepository.delete(r);
-            return "success";
+        if(r == null || r.getStatus().equalsIgnoreCase("Closed")){
+            throw new ApiException("repair request not found or already closed");
         }
-        return "repair request not found";
+        repairRepository.delete(r);
+
     }
 
-    public String setStatusClose(Integer id, Integer employeeId){
+    public void setStatusClose(Integer id, Integer employeeId){
         Repair r = getRepairById(id);
         if(r != null && employeeService.checkIfSameFactory(employeeId, r.getFactoryId())){
             if(r.getStatus().equalsIgnoreCase("Open")){
@@ -75,11 +76,11 @@ public class RepairService{
                 r.setStatus("Closed");
                 r.setEndDate(LocalDateTime.now());
                 repairRepository.save(r);
-                return "success";
+                return;
             }
-           return "repair already closed";
+            throw new ApiException("repair already closed");
         }
-        return "repair request not found";
+        throw new ApiException("repair request not found or unauthorized");
     }
 
     public Repair getRepairById(Integer id){

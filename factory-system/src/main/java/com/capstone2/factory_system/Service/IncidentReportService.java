@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Employee;
 import com.capstone2.factory_system.Model.Factory;
 import com.capstone2.factory_system.Model.IncidentReport;
@@ -21,7 +22,7 @@ public class IncidentReportService {
         return incidentReportRepository.findAll();
     }
 
-    public String createIncidentReport(IncidentReport incidentReport){
+    public void createIncidentReport(IncidentReport incidentReport){
         Employee e = employeeService.getEmployeeById(incidentReport.getReportedBy());
         if(e != null && e.getFactoryId().equals(incidentReport.getFactoryId())){
             if(incidentReport.getDateReported() == null){
@@ -29,16 +30,16 @@ public class IncidentReportService {
             }
             incidentReport.setStatus("Open");
             incidentReportRepository.save(incidentReport);
-            return "success";
+            return;
         }
-        return "employee doesn't exist or factory doesn't match";
+        throw new ApiException("employee doesn't exist or factory doesn't match");
     }
 
-    public String updateIncidentReport(Integer id, IncidentReport incidentReport){
+    public void updateIncidentReport(Integer id, IncidentReport incidentReport){
         IncidentReport ir = getIncidentById(id);
         Employee e = employeeService.getEmployeeById(incidentReport.getReportedBy());
         if(ir == null){
-            return "Incident Report doesn't exist";
+            throw new ApiException("Incident Report doesn't exist");
         }
         if(e != null && e.getFactoryId().equals(incidentReport.getFactoryId())){
             ir.setDescription(incidentReport.getDescription());
@@ -47,22 +48,22 @@ public class IncidentReportService {
             ir.setSeverity(incidentReport.getSeverity());
             ir.setStatus(incidentReport.getStatus());
             incidentReportRepository.save(ir);
-            return "success";
+            return;
         }
-        return "employee doesn't exist or factory doesn't match";
+        throw new ApiException("employee doesn't exist or factory doesn't match");
     }
 
-    public String deleteIncident(String username, Integer id){
+    public void deleteIncident(String username, Integer id){
         IncidentReport ir = getIncidentById(id);
         if(ir == null){
-            return "incident not found";
+            throw new ApiException("incident not found");
         }
         Factory f = factoryService.getFactoryByUsername(username);
         if(f != null && f.getFactoryId().equals(ir.getFactoryId())){
             incidentReportRepository.delete(ir);
-            return "success";
+            return;
         }
-        return "factory doesn't match";
+        throw new ApiException("factory doesn't match");
     }
 
 

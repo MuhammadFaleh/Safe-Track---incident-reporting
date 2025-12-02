@@ -1,5 +1,6 @@
 package com.capstone2.factory_system.Service;
 
+import com.capstone2.factory_system.Api.ApiException;
 import com.capstone2.factory_system.Model.Department;
 import com.capstone2.factory_system.Model.Employee;
 import com.capstone2.factory_system.Model.Factory;
@@ -20,27 +21,27 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    public String createEmployee(Employee employee){
+    public void createEmployee(Employee employee){
         Department d = departmentService.getDepartmentById(employee.getDepartmentId());
         if(d != null && d.getFactoryId().equals(employee.getFactoryId())){
             if(getEmployeeByEmail(employee.getEmail()) == null){
                 Employee e = getEmployeeById(employee.getManagerId());
                 if(employee.getManagerId() == null ||  e != null && e.getFactoryId().equals(employee.getFactoryId())){
                     employeeRepository.save(employee);
-                    return "success";
+                    return;
                 }
-                return "invalid manager id";
+                throw new ApiException("invalid manager id");
             }
-            return "email exist";
+            throw new ApiException("email exist");
         }
-        return "department or factory don't exist";
+        throw new ApiException("department or factory don't exist");
     }
 
-    public String updateEmployee(Integer id, Employee employee){
+    public void updateEmployee(Integer id, Employee employee){
         Department d = departmentService.getDepartmentById(employee.getDepartmentId());
         Employee e = getEmployeeById(id);
         if(e == null){
-            return "no record found";
+            throw new ApiException("no employee record found");
         }
         if(d != null && d.getFactoryId().equals(employee.getFactoryId())){
             if(e.getEmail().equalsIgnoreCase(employee.getEmail()) || getEmployeeByEmail(employee.getEmail()) == null){
@@ -53,26 +54,26 @@ public class EmployeeService {
                     e.setManagerId(employee.getManagerId());
                     e.setFactoryId(employee.getFactoryId());
                     employeeRepository.save(e);
-                    return "success";
+                    return;
                 }
-                return "invalid manager id";
+                throw new ApiException("invalid manager id");
             }
-            return "email exist";
+            throw new ApiException("email exist");
         }
-        return "department or factory don't exist";
+        throw new ApiException("department or factory don't exist");
     }
 
-    public String deleteEmployee(String username, Integer id){
+    public void deleteEmployee(String username, Integer id){
         Employee e = getEmployeeById(id);
         Factory f = factoryService.getFactoryByUsername(username);
         if(e == null){
-            return "no record found";
+            throw new ApiException("no record found");
         }
         if(f != null && f.getFactoryId().equals(e.getFactoryId())){
             employeeRepository.delete(e);
-            return "success";
+            return;
         }
-        return "unauthorized";
+        throw new ApiException("unauthorized");
     }
     public Employee getEmployeeByEmail(String email){
         return employeeRepository.findEmployeeByEmail(email);

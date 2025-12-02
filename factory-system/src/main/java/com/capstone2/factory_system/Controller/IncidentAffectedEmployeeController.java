@@ -21,36 +21,21 @@ public class IncidentAffectedEmployeeController {
     }
 
     @PostMapping("/create-incident-affected-employee")
-    public ResponseEntity<?> createIncidentAffectedEmp(@RequestBody @Valid IncidentAffectedEmployee incidentAffectedEmployee, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = incidentAffectedEmployeeService.createIncidentAffectedEmp(incidentAffectedEmployee);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident affected employee was created successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> createIncidentAffectedEmp(@RequestBody @Valid IncidentAffectedEmployee incidentAffectedEmployee){
+        incidentAffectedEmployeeService.createIncidentAffectedEmp(incidentAffectedEmployee);
+        return ResponseEntity.status(200).body(new ApiResponse("incident affected employee was created successfully"));
     }
 
     @PutMapping("/update-incident-affected-employee/{id}")
-    public ResponseEntity<?> updateIncidentAffectedEmp(@PathVariable Integer id, @RequestBody @Valid IncidentAffectedEmployee incidentAffectedEmployee, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }
-        String status = incidentAffectedEmployeeService.updateIncidentAffectedEmp(id, incidentAffectedEmployee);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident affected employee was updated successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+    public ResponseEntity<?> updateIncidentAffectedEmp(@PathVariable Integer id, @RequestBody @Valid IncidentAffectedEmployee incidentAffectedEmployee){
+        incidentAffectedEmployeeService.updateIncidentAffectedEmp(id, incidentAffectedEmployee);
+        return ResponseEntity.status(200).body(new ApiResponse("incident affected employee was updated successfully"));
     }
 
     @DeleteMapping("/delete-incident-affected-employee/{id}/{username}")
     public ResponseEntity<?> deleteIncidentAffectedEmp(@PathVariable Integer id, @PathVariable String username){
-        String status = incidentAffectedEmployeeService.deleteIncidentAffectedEmp(id, username);
-        if(status.equalsIgnoreCase("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("incident affected employee was deleted successfully"));
-        }
-        return ResponseEntity.status(400).body(new ApiResponse(status));
+        incidentAffectedEmployeeService.deleteIncidentAffectedEmp(id, username);
+        return ResponseEntity.status(200).body(new ApiResponse("incident affected employee was deleted successfully"));
     }
 
     @GetMapping("/get-incident-affected-employee-id/{id}")
