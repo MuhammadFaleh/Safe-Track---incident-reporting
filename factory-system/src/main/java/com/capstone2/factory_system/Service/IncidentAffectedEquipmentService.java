@@ -38,7 +38,6 @@ public class IncidentAffectedEquipmentService{
         }
 
         incidentAffectedEquipmentRepository.save(equ);
-        throw new ApiException("success");
     }
 
     public void updateIncidentAffectedEqu(Integer id, IncidentAffectedEquipment equ){
@@ -77,7 +76,7 @@ public class IncidentAffectedEquipmentService{
         if (ir != null) {
             if (f != null && f.getFactoryId().equals(ir.getFactoryId())) {
                 incidentAffectedEquipmentRepository.delete(iae);
-                throw new ApiException("success");
+                return;
             }
             throw new ApiException("unauthorized");
         }
@@ -102,3 +101,4 @@ public class IncidentAffectedEquipmentService{
 
     }
 }
+
