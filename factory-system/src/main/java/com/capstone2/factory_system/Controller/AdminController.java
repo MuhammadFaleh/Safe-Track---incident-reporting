@@ -27,7 +27,7 @@ public class AdminController {
 
     }
     @PutMapping("/update-admin/{id}")
-    public ResponseEntity<?> updateAdmin(@PathVariable Integer id, @RequestBody @Valid Admin admin, Errors errors){
+    public ResponseEntity<?> updateAdmin(@PathVariable Integer id, @RequestBody @Valid Admin admin){
 
         adminService.updateAdmin(id,admin);
         return ResponseEntity.status(200).body(new ApiResponse("admin was updated successfully"));
@@ -52,3 +52,4 @@ public class AdminController {
         return ResponseEntity.status(200).body(adminService.getAdminByUsername(username));
     }
 }
+
